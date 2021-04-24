@@ -1,0 +1,25 @@
+#!/bin/bash
+
+CHROMEDRIVER_PATH="/usr/local/bin/chromedriver"
+echo "latest chrome version: $CHROME_DRIVER_VERSION"
+
+CHROMEDRIVER_BASE_VERSION=$(echo $(/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version | awk '{ print $3 }') | cut -d '.' -f1 -f2 -f3)
+# get the latest version, will be stored as a string in a file LATEST_RELEASE
+wget -N https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROMEDRIVER_BASE_VERSION
+CHROMEDRIVER_FULL_VERSION=$(cat $(ls | grep LATEST_RELEASE))
+
+wget -N https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_FULL_VERSION/chromedriver_mac64.zip -P ~/
+
+
+ZIP_FILENAME="chromedriver_mac64.zip"
+
+unzip ~/$ZIP_FILENAME -d ~/
+rm ~/$ZIP_FILENAME
+mv -f ~/chromedriver $CHROMEDRIVER_PATH
+
+chmod 0755 $CHROMEDRIVER_PATH
+
+echo "finished! chromedriver version $(chromedriver --version) installed"
+echo "cleaning up LATEST_RELEASE file"
+rm -v LATEST_RELEASE_* 
+echo "done"
