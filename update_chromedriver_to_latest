@@ -3,23 +3,25 @@
 CHROMEDRIVER_PATH="/usr/local/bin/chromedriver"
 echo "latest chrome version: $CHROME_DRIVER_VERSION"
 
-# get the latest version, will be stored as a string in a file LATEST_RELEASE
-wget -N https://chromedriver.storage.googleapis.com/LATEST_RELEASE
-CHROMEDRIVER_VERSION=$(cat LATEST_RELEASE)
+
+URL="https://googlechromelabs.github.io/chrome-for-testing/#stable"
+HTML=$(curl -s "$URL")
+# scrape the latest version string from the HTML
+CHROMEDRIVER_VERSION=$(echo "$HTML" | grep -A1 'tr class=status-ok' | grep -o '<code>[^<]*</code>' | sed -n 's/<code>\(.*\)<\/code>/\1/p' | head -1)
 
 echo 'downloading'
-wget -N https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_mac64.zip -P ~/
+wget -N 	https://storage.googleapis.com/chrome-for-testing-public/$CHROMEDRIVER_VERSION/mac-x64/chromedriver-mac-x64.zip -P ~/
 
-ZIP_FILENAME="chromedriver_mac64.zip"
+ZIP_FILENAME="chromedriver-mac-x64.zip"
 
 echo 'unzipping'
 unzip -o ~/$ZIP_FILENAME -d ~/
 rm ~/$ZIP_FILENAME
-mv -f ~/chromedriver $CHROMEDRIVER_PATH
+mv -f ~/chromedriver-mac-x64/chromedriver $CHROMEDRIVER_PATH
 
 chmod 0755 $CHROMEDRIVER_PATH
 
 echo "finished! chromedriver version $(chromedriver --version) installed"
-echo "cleaning up LATEST_RELEASE file"
-rm -v LATEST_RELEASE
+echo "cleaning up ~/chromedriver-mac-x64"
+rm -rfv ~/chromedriver-mac-x64
 echo "done"
